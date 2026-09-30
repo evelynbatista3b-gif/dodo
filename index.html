@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DOOM —  List</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --verde: #20e0a5;
+            --amarelo: #d8e52c;
+            --preto: #050807;
+            --texto: #e9fff8;
+            --cinza: #8aa59d;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Courier New", monospace;
+            color: var(--texto);
+
+            background:
+                linear-gradient(
+                    rgba(0, 0, 0, 0.72),
+                    rgba(0, 0, 0, 0.85)
+                ),
+                url("doutor-destino.png") center / cover fixed no-repeat;
+
+            overflow-x: hidden;
+        }
+
+        /* Efeito de linhas */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.12;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 3px,
+                    rgba(32, 224, 165, 0.2) 4px
+                );
+
+            z-index: 20;
+        }
+
+        .container {
+            width: min(900px, 92%);
+            margin: auto;
+            padding: 55px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* TÍTULO */
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            letter-spacing: 10px;
+            color: var(--verde);
+
+            text-shadow:
+                0 0 10px rgba(32, 224, 165, 0.7),
+                0 0 30px rgba(32, 224, 165, 0.25);
+        }
+
+        header p {
+            color: var(--amarelo);
+            letter-spacing: 4px;
+            margin-top: 8px;
+            font-size: 0.8rem;
+        }
+
+        .linha {
+            height: 1px;
+            margin-top: 20px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    var(--verde),
+                    var(--amarelo),
+                    var(--verde),
+                    transparent
+                );
+        }
+
+        /* CAIXA PRINCIPAL */
+
+        .app {
+            position: relative;
+
+            background: rgba(4, 12, 11, 0.88);
+            backdrop-filter: blur(6px);
+
+            border: 1px solid var(--verde);
+
+            padding: 25px;
+
+            box-shadow:
+                0 0 35px rgba(0, 0, 0, 0.7),
+                inset 0 0 30px rgba(32, 224, 165, 0.03);
+        }
+
+        /* Cantos */
+
+        .app::before,
+        .app::after {
+            content: "";
+            position: absolute;
+            width: 55px;
+            height: 55px;
+        }
+
+        .app::before {
+            top: -1px;
+            left: -1px;
+
+            border-top: 2px solid var(--amarelo);
+            border-left: 2px solid var(--amarelo);
+        }
+
+        .app::after {
+            right: -1px;
+            bottom: -1px;
+
+            border-right: 2px solid var(--amarelo);
+            border-bottom: 2px solid var(--amarelo);
+        }
+
+        /* CAMPO DE ADICIONAR */
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        #taskInput {
+            flex: 1;
+
+            min-width: 0;
+
+            padding: 15px;
+
+            background: rgba(0, 0, 0, 0.6);
+
+            color: var(--texto);
+
+            border: 1px solid var(--verde);
+
+            outline: none;
+
+            font: inherit;
+        }
+
+        #taskInput:focus {
+            border-color: var(--amarelo);
+
+            box-shadow:
+                0 0 12px rgba(216, 229, 44, 0.25);
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+
+            border: 1px solid var(--verde);
+
+            background: transparent;
+
+            color: var(--verde);
+
+            transition: 0.2s;
+        }
+
+        button:hover {
+            color: #000;
+            background: var(--verde);
+
+            box-shadow:
+                0 0 15px rgba(32, 224, 165, 0.35);
+        }
+
+        #addBtn {
+            padding: 0 20px;
+            font-weight: bold;
+        }
+
+        /* CONTADOR */
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+
+            gap: 10px;
+
+            color: var(--cinza);
+
+            font-size: 0.78rem;
+
+            margin-bottom: 15px;
+        }
+
+        /* LISTA */
+
+        #taskList {
+            list-style: none;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 9px;
+        }
+
+        /* TAREFA */
+
+        .task {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            min-height: 54px;
+
+            padding: 9px 10px;
+
+            background: rgba(0, 0, 0, 0.48);
+
+            border: 1px solid var(--verde);
+
+            border-left: 3px solid var(--verde);
+
+            animation: aparecer 0.25s ease;
+        }
+
+        /* Alterna verde / amarelo */
+
+        .task:nth-child(even) {
+            border-color: var(--amarelo);
+            border-left-color: var(--amarelo);
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* CHECKBOX */
+
+        .check {
+            width: 24px;
+            height: 24px;
+
+            flex-shrink: 0;
+
+            border: 1px solid var(--verde);
+
+            background: transparent;
+
+            display: grid;
+            place-items: center;
+
+            color: #000;
+
+            font-weight: bold;
+        }
+
+        .task:nth-child(even) .check {
+            border-color: var(--amarelo);
+        }
+
+        .task.done .check {
+            background: var(--verde);
+        }
+
+        .task:nth-child(even).done .check {
+            background: var(--amarelo);
+        }
+
+        /* TEXTO */
+
+        .task-text {
+            flex: 1;
+
+            word-break: break-word;
+
+            line-height: 1.35;
+        }
+
+        /* RISQUINHO */
+
+        .task.done .task-text {
+            text-decoration: line-through;
+
+            opacity: 0.45;
+        }
+
+        /* BOTÃO EXCLUIR */
+
+        .delete {
+            width: 30px;
+            height: 30px;
+
+            color: #ff7777;
+
+            border-color: #753838;
+        }
+
+        .delete:hover {
+            background: #ff5555;
+            color: #000;
+        }
+
+        /* LISTA VAZIA */
+
+        .empty {
+            text-align: center;
+
+            padding: 35px 10px;
+
+            color: var(--cinza);
+
+            border: 1px dashed #31544b;
+        }
+
+        /* RODAPÉ */
+
+        .footer {
+            text-align: center;
+
+            color: #638078;
+
+            font-size: 0.68rem;
+
+            margin-top: 20px;
+
+            letter-spacing: 2px;
+        }
+
+        /* CONFETES */
+
+        .confetti {
+            position: fixed;
+
+            width: 8px;
+            height: 13px;
+
+            top: -20px;
+
+            z-index: 100;
+
+            pointer-events: none;
+
+            animation: cair linear forwards;
+        }
+
+        @keyframes cair {
+
+            0% {
+                transform:
+                    translate3d(0, -20px, 0)
+                    rotate(0deg);
+
+                opacity: 1;
+            }
+
+            100% {
+                transform:
+                    translate3d(var(--x), 105vh, 0)
+                    rotate(720deg);
+
+                opacity: 0;
+            }
+        }
+
+        /* CELULAR */
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 30px 0;
+            }
+
+            .app {
+                padding: 15px;
+            }
+
+            .input-area {
+                flex-direction: column;
+            }
+
+            #addBtn {
+                height: 48px;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+
+            <h1>DOOM</h1>
+
+            <p>
+                VDOOM - LIST
+            </p>
+
+            <div class="linha"></div>
+
+        </header>
+
+
+        <main class="app">
+
+            <!-- CAMPO PARA ADICIONAR -->
+
+            <form
+                class="input-area"
+                id="taskForm"
+            >
+
+                <input
+                    id="taskInput"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Digite uma nova missão..."
+                    autocomplete="off"
+                >
+
+                <button
+                    id="addBtn"
+                    type="submit"
+                >
+                    + ADICIONAR
+                </button>
+
+            </form>
+
+
+            <!-- INFORMAÇÕES -->
+
+            <div class="stats">
+
+                <span id="counter">
+                    0 tarefas
+                </span>
+
+                <span id="date"></span>
+
+            </div>
+
+
+            <!-- TAREFAS -->
+
+            <ul id="taskList"></ul>
+
+
+            <div class="footer">
+
+                OS DADOS FICAM SALVOS NO NAVEGADOR
+                • LOCAL STORAGE
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script>
+
+        /*
+        =====================================
+        CONFIGURAÇÃO
+        =====================================
+        */
+
+        const STORAGE_KEY = "doom_todo_tasks_v1";
+
+
+        const taskForm =
+            document.getElementById("taskForm");
+
+        const taskInput =
+            document.getElementById("taskInput");
+
+        const taskList =
+            document.getElementById("taskList");
+
+        const counter =
+            document.getElementById("counter");
+
+        const dateEl =
+            document.getElementById("date");
+
+
+        /*
+        =====================================
+        CARREGAR TAREFAS
+        =====================================
+        */
+
+        let tasks =
+            JSON.parse(
+                localStorage.getItem(STORAGE_KEY)
+            ) || [];
+
+
+        /*
+        =====================================
+        SALVAR
+        =====================================
+        */
+
+        function saveTasks() {
+
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(tasks)
+            );
+
+        }
+
+
+        /*
+        =====================================
+        MOSTRAR TAREFAS
+        =====================================
+        */
+
+        function renderTasks() {
+
+            taskList.innerHTML = "";
+
+
+            /* Nenhuma tarefa */
+
+            if (tasks.length === 0) {
+
+                taskList.innerHTML = `
+
+                    <li class="empty">
+
+                        NENHUMA MISSÃO REGISTRADA.
+
+                        <br>
+
+                        <span>
+                            Adicione uma tarefa acima.
+                        </span>
+
+                    </li>
+
+                `;
+
+            }
+
+
+            /*
+            Criar cada tarefa
+            */
+
+            tasks.forEach(task => {
+
+                const li =
+                    document.createElement("li");
+
+
+                li.className =
+                    "task" +
+                    (task.done ? " done" : "");
+
+
+                li.dataset.id =
+                    task.id;
+
+
+                li.innerHTML = `
+
+                    <button
+                        class="check"
+                        aria-label="Concluir tarefa"
+                    >
+                        ${task.done ? "✓" : ""}
+                    </button>
+
+
+                    <span class="task-text"></span>
+
+
+                    <button
+                        class="delete"
+                        aria-label="Excluir tarefa"
+                    >
+                        ✕
+                    </button>
+
+                `;
+
+
+                /*
+                Texto
+                */
+
+                li.querySelector(
+                    ".task-text"
+                ).textContent = task.text;
+
+
+                /*
+                CONCLUIR
+                */
+
+                li.querySelector(
+                    ".check"
+                ).addEventListener(
+                    "click",
+                    () => {
+
+                        const wasDone =
+                            task.done;
+
+
+                        task.done =
+                            !task.done;
+
+
+                        saveTasks();
+
+                        renderTasks();
+
+
+                        /*
+                        Se acabou de concluir,
+                        solta confetes
+                        */
+
+                        if (
+                            !wasDone &&
+                            task.done
+                        ) {
+
+                            launchConfetti();
+
+                        }
+
+                    }
+                );
+
+
+                /*
+                EXCLUIR
+                */
+
+                li.querySelector(
+                    ".delete"
+                ).addEventListener(
+                    "click",
+                    () => {
+
+                        tasks =
+                            tasks.filter(
+                                t =>
+                                    t.id !==
+                                    task.id
+                            );
+
+
+                        saveTasks();
+
+                        renderTasks();
+
+                    }
+                );
+
+
+                taskList.appendChild(li);
+
+            });
+
+
+            /*
+            Contador
+            */
+
+            const pending =
+                tasks.filter(
+                    t => !t.done
+                ).length;
+
+
+            if (tasks.length === 1) {
+
+                counter.textContent =
+                    `1 tarefa • ${pending} pendente`;
+
+            } else {
+
+                counter.textContent =
+                    `${tasks.length} tarefas • ${pending} pendentes`;
+
+            }
+
+        }
+
+
+        /*
+        =====================================
+        ADICIONAR TAREFA
+        =====================================
+        */
+
+        taskForm.addEventListener(
+            "submit",
+            event => {
+
+                event.preventDefault();
+
+
+                const text =
+                    taskInput.value.trim();
+
+
+                if (!text) {
+
+                    taskInput.focus();
+
+                    return;
+
+                }
+
+
+                /*
+                Criar tarefa
+                */
+
+                tasks.unshift({
+
+                    id:
+                        Date.now() +
+                        Math.random(),
+
+                    text: text,
+
+                    done: false,
+
+                    createdAt:
+                        new Date().toISOString()
+
+                });
+
+
+                /*
+                Salvar
+                */
+
+                saveTasks();
+
+
+                /*
+                Atualizar tela
+                */
+
+                renderTasks();
+
+
+                /*
+                Limpar campo
+                */
+
+                taskInput.value = "";
+
+
+                taskInput.focus();
+
+            }
+        );
+
+
+        /*
+        =====================================
+        CONFETES
+        =====================================
+        */
+
+        function launchConfetti() {
+
+            const pieces = 70;
+
+
+            for (
+                let i = 0;
+                i < pieces;
+                i++
+            ) {
+
+                const confetti =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                confetti.className =
+                    "confetti";
+
+
+                /*
+                Cores
+                */
+
+                const colors = [
+
+                    "#20e0a5",
+                    "#d8e52c",
+                    "#ffffff",
+                    "#79ffd7"
+
+                ];
+
+
+                confetti.style.background =
+                    colors[
+                        Math.floor(
+                            Math.random() *
+                            colors.length
+                        )
+                    ];
+
+
+                /*
+                Posição inicial
+                */
+
+                confetti.style.left =
+                    Math.random() * 100 +
+                    "vw";
+
+
+                /*
+                Movimento horizontal
+                */
+
+                confetti.style.setProperty(
+
+                    "--x",
+
+                    (
+                        Math.random() *
+                        300 -
+                        150
+                    ) + "px"
+
+                );
+
+
+                /*
+                Velocidade
+                */
+
+                confetti.style.animationDuration =
+
+                    (
+                        1.5 +
+                        Math.random() * 2.2
+                    ) + "s";
+
+
+                /*
+                Atraso aleatório
+                */
+
+                confetti.style.animationDelay =
+
+                    (
+                        Math.random() * 0.25
+                    ) + "s";
+
+
+                /*
+                Rotação
+                */
+
+                confetti.style.transform =
+
+                    `rotate(
+                        ${Math.random() * 360}deg
+                    )`;
+
+
+                document.body.appendChild(
+                    confetti
+                );
+
+
+                /*
+                Apagar depois da animação
+                */
+
+                setTimeout(
+                    () => confetti.remove(),
+                    4500
+                );
+
+            }
+
+        }
+
+
+        /*
+        =====================================
+        DATA
+        =====================================
+        */
+
+        dateEl.textContent =
+            new Date().toLocaleDateString(
+                "pt-BR",
+                {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                }
+            ).toUpperCase();
+
+
+        /*
+        =====================================
+        INICIAR
+        =====================================
+        */
+
+        renderTasks();
+
+    </script>
+
+</body>
+</html>
